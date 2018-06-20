@@ -13,7 +13,7 @@
 	 -->
     <groupId>net.engining.control</groupId>
     <artifactId>control-maven-plugin</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
 	<name>Flow Transactions Control - 代码生成Maven插件</name>
 	<packaging>maven-plugin</packaging>
 	<description>用于生成基于ServiceInvoker相关包装类。</description>
@@ -23,7 +23,7 @@
 		<jdk.version>1.8</jdk.version>
 
 		<pg.version>3.2.0-SNAPSHOT</pg.version>
-		<control.version>1.1.0-SNAPSHOT</control.version>
+		<control.version>1.1.1-SNAPSHOT</control.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<ibator.version>1.2.1.681</ibator.version>
 		
