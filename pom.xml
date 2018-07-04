@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.engining.project</groupId>
 		<artifactId>project-parent</artifactId>
-		<version>3.2-SNAPSHOT</version>
+		<version>3.3-SNAPSHOT</version>
 	</parent>
 	
 	<groupId>net.engining.control</groupId>
@@ -15,7 +15,7 @@
 	
 	<properties>
 		<control.version>1.1.1-SNAPSHOT</control.version>
-		<pg.version>3.2.0-SNAPSHOT</pg.version>
+		<pg.version>3.3.0-SNAPSHOT</pg.version>
 	</properties>
 	
 	<dependencyManagement>
