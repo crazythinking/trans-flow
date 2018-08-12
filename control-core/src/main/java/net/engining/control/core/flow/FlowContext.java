@@ -25,7 +25,9 @@ public class FlowContext {
 		FAIL,
 		SUCCESS
 	}
-
+	
+	public static String SKIP_TRUE = "TRUE";
+	
 	/**
 	 * Flow的代码
 	 */
