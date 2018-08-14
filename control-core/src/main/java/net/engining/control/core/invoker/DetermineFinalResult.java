@@ -12,13 +12,11 @@ import net.engining.pg.support.core.exception.ErrorMessageException;
 
 @InvokerDefinition(
 	name = "结果处理",
-	optional = {
-		ErrorMessagesKey.class
-	},
 	results = {
-		FinalResultKey.class
-	}
-)
+			ErrorMessagesKey.class,
+			FinalResultKey.class
+			}
+	)
 public class DetermineFinalResult implements Invoker {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());

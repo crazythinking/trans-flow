@@ -158,7 +158,6 @@ public class ServiceFlowMojo extends AbstractMojo {
 					FileOutputStream fos = FileUtils.openOutputStream(dotFile);
 					OutputStreamWriter osw = new OutputStreamWriter(fos, Charsets.UTF_8);
 					graphvizPrinter = new PrintWriter(osw);
-
 					graphvizPrinter.println("digraph g {");
 					graphvizPrinter.println("graph [");
 					graphvizPrinter.println("rankdir = \"LR\"");
@@ -166,15 +165,16 @@ public class ServiceFlowMojo extends AbstractMojo {
 					graphvizPrinter.println("fontname=\"SimSun\"");
 					graphvizPrinter.println("];");
 
+					// FlowDefinition定义的invoker
 					Class<? extends Invoker>[] invokers = fd.invokers();
-
 					// 必须输入的上下文属性
 					Set<Class<? extends ContextKey<?>>> requires = Sets.newHashSet();
 					// 可选输入的上下文属性
 					Set<Class<? extends ContextKey<?>>> optional = Sets.newHashSet();
 
 					// 整理FlowTrans输入的上下文属性，包括必须输入的，可选输入的
-					// 先将Flow输出属性，作为必须的上下文属性加入
+					// FIXME ?这里逻辑有问题，直接去掉会造成生成graphviz出错，line273；但是将输出项加入确实不合理；
+//					getLog().debug("去掉将Flow输出属性，作为必须的上下文属性加入");
 					requires.addAll(Arrays.asList(fd.response()));
 					for (int i = invokers.length - 1; i >= 0; i--) {
 						getLog().debug(MessageFormat.format("处理Flow[{0}], Invoker[{1}]", clazz.getSimpleName(), invokers[i].getSimpleName()));
@@ -211,7 +211,7 @@ public class ServiceFlowMojo extends AbstractMojo {
 					}
 
 					graphvizPrinter.println("}");
-
+					//排除掉所有必须输入的项，剩下正真可选的项
 					optional.removeAll(requires);
 
 					// 生成graphviz内Flow相关内容，包括Request的上下文属性，必输项和可选项；
@@ -275,10 +275,13 @@ public class ServiceFlowMojo extends AbstractMojo {
 						}
 					}
 					graphvizPrinter.println("}");
+					graphvizPrinter.close();
 
 					// 开始生成FlowTrans对应的Request类
 					String requestName = basePackage + relativePackage + "." + flowCode + "Request";
 					getLog().debug("构建Request类：" + requestName);
+					//FIXME line176 不合理逻辑，这里先打补丁排除
+					requires.removeAll(Arrays.asList(fd.response()));
 					TopLevelClass request = createWrapper(requestName, fd, flowCode, requires, optional);
 					outputClass(request, r);
 					
@@ -315,6 +318,7 @@ public class ServiceFlowMojo extends AbstractMojo {
 						requestSamplePrinter.println("#" + c.getAnnotation(KeyDefinition.class).name());
 						requestSamplePrinter.println(StringUtils.uncapitalize(StringUtils.remove(c.getSimpleName(), "Key")) + "=");
 					}
+					requestSamplePrinter.close();
 					
 					getLog().info(MessageFormat.format("结束构建FlowTrans的相关生成文件：[{0}]", flowCode));
 				}
@@ -325,11 +329,12 @@ public class ServiceFlowMojo extends AbstractMojo {
 			Resource listResource = new Resource();
 			listResource.setDirectory(outputDirectory);
 			String listFile = project.getArtifactId() + ".properties";
-			PrintWriter w = new PrintWriter(new OutputStreamWriter(
+			PrintWriter flowtransSummaryPrinter = new PrintWriter(new OutputStreamWriter(
 					FileUtils.openOutputStream(new File(outputDirectory, listFile)), Charsets.UTF_8));
 			//将FlowTrans列表写入Properties文件
-			flowListProperties.store(w, "Flow Transactions List");
-			w.close();
+			flowListProperties.store(flowtransSummaryPrinter, "Flow Transactions List");
+			flowtransSummaryPrinter.close();
+			
 			listResource.addInclude(listFile);
 			project.addResource(listResource);
 			

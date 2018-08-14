@@ -175,19 +175,22 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-			<id>repo</id>
+			<!-- <id>repo</id> -->
+			<id>zebra</id>
 			<distributionManagement>
 				<snapshotRepository>
-					<id>repo</id>
+					<!-- <id>repo</id> -->
+					<id>zebra</id>
 					<!-- <url>http://172.28.0.124:8081/nexus/content/repositories/snapshots</url> -->
-					<!-- <url>http://118.242.36.102:6474/nexus/content/repositories/snapshots</url> -->
-					<url>https://dev.aceistar.com:18081/nexus/content/repositories/snapshots</url>
+					<url>http://118.242.36.102:6474/nexus/content/repositories/snapshots</url>
+					<!-- <url>https://dev.aceistar.com:18081/nexus/content/repositories/snapshots</url> -->
 				</snapshotRepository>
 				<repository>
-					<id>repo</id>
+					<!-- <id>repo</id> -->
+					<id>zebra</id>
 					<!-- <url>http://172.28.0.124:8081/nexus/content/repositories/releases</url> -->
-					<!-- <url>http://118.242.36.102:6474/nexus/content/repositories/releases</url> -->
-					<url>https://dev.aceistar.com:18081/nexus/content/repositories/releases</url>
+					<url>http://118.242.36.102:6474/nexus/content/repositories/releases</url>
+					<!-- <url>https://dev.aceistar.com:18081/nexus/content/repositories/releases</url> -->
 				</repository>
 			</distributionManagement>
 		</profile>

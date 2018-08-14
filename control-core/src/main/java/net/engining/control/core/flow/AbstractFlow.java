@@ -171,7 +171,7 @@ public abstract class AbstractFlow implements InitializingBean
 				logger.warn("RuntimeException:事务回滚[{}]", e.getClass().getCanonicalName());
 				context.setLastException(e);
 			}
-			catch (Exception e)
+			catch (Exception e)//@Transactional 默认只对RuntimeException进行回滚
 			{
 				logger.warn("Checked Exception:事务提交[{}]", e.getClass().getCanonicalName());
 				context.setLastException(e);
