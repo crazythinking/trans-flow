@@ -174,19 +174,22 @@ public class ServiceFlowMojo extends AbstractMojo {
 
 					// 整理FlowTrans输入的上下文属性，包括必须输入的，可选输入的
 					// FIXME ?这里逻辑有问题，直接去掉会造成生成graphviz出错，line273；但是将输出项加入确实不合理；
-//					getLog().debug("去掉将Flow输出属性，作为必须的上下文属性加入");
-					requires.addAll(Arrays.asList(fd.response()));
+//					requires.addAll(Arrays.asList(fd.response()));
 					for (int i = invokers.length - 1; i >= 0; i--) {
 						getLog().debug(MessageFormat.format("处理Flow[{0}], Invoker[{1}]", clazz.getSimpleName(), invokers[i].getSimpleName()));
 						InvokerDefinition id = invokers[i].getAnnotation(InvokerDefinition.class);
 						checkNotNull(id, "涉及@FlowDefinition定义的Invoker必须使用@InvokerDefinition定义属性");
 
+						//先删除该invoke中返回的字段，因为如果该invoke的返回字段，是下一个invoke的输入字段，那么就无需暴露出去；
 						requires.removeAll(Arrays.asList(id.results()));
 						optional.removeAll(Arrays.asList(id.results()));
+						
+						// 由于HashSet是无序不重复的，所以不需要去重，直接加即可
 						// 再加入各Invoker的必须输入项
 						requires.addAll(Arrays.asList(id.requires()));
 						// 加入各Invoker的可选输入项
 						optional.addAll(Arrays.asList(id.optional()));
+						
 					}
 
 					// 生成graphviz内Invoker相关内容，包括输入的上下文属性，输出的上下文属性
@@ -270,8 +273,10 @@ public class ServiceFlowMojo extends AbstractMojo {
 
 					// 对于FlowTrans的输出项，标识“_response:”，表明是输出项
 					for (Class<? extends ContextKey<?>> key : fd.response()) {
-						for (String s : source.get(key)) {
-							graphvizPrinter.println(MessageFormat.format("{0}:out_{1} -> {2}:in_{1};", s, key.getSimpleName(), "_response"));
+						if(source.containsKey(key)){
+							for (String s : source.get(key)) {
+								graphvizPrinter.println(MessageFormat.format("{0}:out_{1} -> {2}:in_{1};", s, key.getSimpleName(), "_response"));
+							}
 						}
 					}
 					graphvizPrinter.println("}");
@@ -280,8 +285,6 @@ public class ServiceFlowMojo extends AbstractMojo {
 					// 开始生成FlowTrans对应的Request类
 					String requestName = basePackage + relativePackage + "." + flowCode + "Request";
 					getLog().debug("构建Request类：" + requestName);
-					//FIXME line176 不合理逻辑，这里先打补丁排除
-					requires.removeAll(Arrays.asList(fd.response()));
 					TopLevelClass request = createWrapper(requestName, fd, flowCode, requires, optional);
 					outputClass(request, r);
 					

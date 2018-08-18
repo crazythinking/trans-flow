@@ -22,6 +22,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -221,10 +222,8 @@ public abstract class AbstractFlow implements InitializingBean
 			}
 			
 			// 检查invokerRequires，必输的上下文属性是否都有值
-			invokerRequires.keySet();
-			for(Class<? extends Invoker> key : invokerRequires.keySet()){
-				Set<Class<? extends ContextKey<?>>> contextKeys = invokerRequires.get(key);
-				for(Class<? extends ContextKey<?>> ckey: contextKeys){
+			if(invokerRequires.get(invoker.getClass()) != null){
+				for(Class<? extends ContextKey<?>> ckey: invokerRequires.get(invoker.getClass())){
 					checkNotNull(context.get((Class<? extends ContextKey<Object>>) ckey), "检查必输的上下文属性, [%s]不可为空", ckey.getCanonicalName());
 				}
 			}
