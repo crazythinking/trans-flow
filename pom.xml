@@ -16,10 +16,16 @@
 	<properties>
 		<control.version>1.1.1-SNAPSHOT</control.version>
 		<pg.version>3.3.0-SNAPSHOT</pg.version>
+		<rocketmq.starter.version>0.1.1</rocketmq.starter.version>
 	</properties>
 	
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+			    <groupId>com.maihaoche</groupId>
+			    <artifactId>spring-boot-starter-rocketmq</artifactId>
+			    <version>${rocketmq.starter.version}</version>
+			</dependency>
 			<!-- pg -->
 			<dependency>
 				<groupId>net.engining.pg</groupId>
@@ -29,6 +35,11 @@
 				<scope>import</scope>
 			</dependency>
 			<!-- control -->
+			<dependency>
+				<groupId>net.engining.control</groupId>
+				<artifactId>control-dict</artifactId>
+				<version>${control.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>net.engining.control</groupId>
 				<artifactId>control-api</artifactId>
@@ -47,6 +58,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<modules>
+		<module>control-dict</module>
 		<module>control-api</module>
 		<module>control-sdk</module>
 		<module>control-core</module>

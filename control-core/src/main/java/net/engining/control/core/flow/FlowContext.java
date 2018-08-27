@@ -23,7 +23,10 @@ public class FlowContext {
 	public static enum CONS_PARAMETERS {
 		SKIP,
 		FAIL,
-		SUCCESS
+		SUCCESS,
+		ROCKETMQ_TRANS_MSG,//RocketMq事务消息，以json string保存
+		ROCKETMQ_TRANS_MSG_ARG,//RocketMq事务消息对应参数，以json string保存
+		TRANS_MSG_SERIALID//事务消息唯一流水ID
 	}
 	
 	public static String SKIP_TRUE = "TRUE";

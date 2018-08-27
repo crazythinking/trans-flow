@@ -57,7 +57,7 @@ public class DetailedFlowListener implements FlowListener {
 		}
 		
 		if(Optional.fromNullable(context.getLastException()).isPresent()){
-			logger.warn("存在异常：[{}]", context.getLastException().getMessage());
+			logger.error("存在异常：[{}]", context.getLastException().getMessage());
 			dump(context.getLastException().getCause());
 		}
 	}
@@ -91,7 +91,7 @@ public class DetailedFlowListener implements FlowListener {
 		PrintWriter printWriter = new PrintWriter(stringWriter);
 		if(Optional.fromNullable(t).isPresent()){
 			t.printStackTrace(printWriter);
-			logger.debug(StringUtils.CR+StringUtils.LF+stringWriter.toString()+StringUtils.CR+StringUtils.LF);
+			logger.error(StringUtils.CR+StringUtils.LF+stringWriter.toString()+StringUtils.CR+StringUtils.LF);
 		}
 		
 	}

@@ -2,33 +2,43 @@ package net.engining.control.core.flow;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.engining.control.api.ContextKey;
-import net.engining.control.core.dispatch.FlowListener;
-import net.engining.control.core.invoker.Invoker;
-import net.engining.control.core.invoker.InvokerDefinition;
-import net.engining.control.core.invoker.Skippable;
-import net.engining.control.core.invoker.TransactionSeperator;
-
+import org.apache.rocketmq.common.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import net.engining.control.api.ContextKey;
+import net.engining.control.api.key.SvPrIdKey;
+import net.engining.control.api.key.TransCodeKey;
+import net.engining.control.api.key.TxnVersionKey;
+import net.engining.control.core.dispatch.FlowListener;
+import net.engining.control.core.invoker.Invoker;
+import net.engining.control.core.invoker.InvokerDefinition;
+import net.engining.control.core.invoker.RocketMqTransactional;
+import net.engining.control.core.invoker.Skippable;
+import net.engining.control.core.invoker.TransactionSeperator;
+import net.engining.control.core.transactional.CommonRocketMqTransactionalProducer;
+import net.engining.pg.support.core.context.ApplicationContextHolder;
 
 /**
  * FlowTrans的Flow抽象，主要用于对FlowTrans中定义的Invoker按事务分隔分组，并依次调用执行
@@ -44,7 +54,10 @@ public abstract class AbstractFlow implements InitializingBean
 	
 	@Autowired(required = false)
 	private FlowListener listeners[] = new FlowListener[0];
-
+	
+	@Autowired
+	private Environment environment;
+	
 	/**
 	 * Invoker列表，在容器初始化时根据 {@link FlowDefinition} 来设置的实例列表
 	 */
@@ -229,6 +242,37 @@ public abstract class AbstractFlow implements InitializingBean
 			}
 			//具体调用invoker
 			invoker.invoke(context);
+			
+			// 支持RocketMq分布式事务消息
+			if (invoker instanceof RocketMqTransactional)
+			{
+				((RocketMqTransactional) invoker).setupTransactionalMessage(context.getParameters());
+				Preconditions.checkNotNull(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG), "该invoker需要分布式事务支持，FlowContext.parameters中必须包含ROCKETMQ_TRANS_MSG");
+				Preconditions.checkNotNull(context.getParameters().get(FlowContext.CONS_PARAMETERS.TRANS_MSG_SERIALID), "该invoker需要分布式事务支持，FlowContext.parameters中必须包含TRANS_MSG_SERIALID");
+				Message msg = JSONObject.parseObject(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG), Message.class);
+				String serialId = context.getParameters().get(FlowContext.CONS_PARAMETERS.TRANS_MSG_SERIALID);
+				//检查message的基本消息，必须包含Topic，tag
+				Preconditions.checkNotNull(msg.getTopic(), "RocketMq Transactional message must have topic");
+				Preconditions.checkNotNull(msg.getTags(), "RocketMq Transactional message must have tag");
+				Preconditions.checkNotNull(msg.getBody(), "RocketMq Transactional message must have body");
+				//唯一标识事务消息的key，通常用业务流水号
+				if(!serialId.equals(msg.getKeys())){
+					msg.setKeys(serialId);
+				}
+				// 使用spring.application.name作为SvPrId
+				Preconditions.checkNotNull(environment.getProperty("spring.application.name"), "spring.application.name must be set");
+				msg.putUserProperty(SvPrIdKey.class.getCanonicalName(), environment.getProperty("spring.application.name"));
+				msg.putUserProperty(TransCodeKey.class.getCanonicalName(), flowCode);
+//				msg.putUserProperty(TxnVersionKey.class.getCanonicalName(), environment.getProperty("info.version"));
+				
+				Map<String, Serializable> arg = JSONObject.parseObject(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG_ARG), Map.class);
+				
+				CommonRocketMqTransactionalProducer commonRocketMqTransactionProducer = ApplicationContextHolder.getBean(CommonRocketMqTransactionalProducer.class);
+				// send transactional message
+				Preconditions.checkNotNull(commonRocketMqTransactionProducer, "CommonRocketMqTransactionProducer 需要被注入ApplicationContext");
+				commonRocketMqTransactionProducer.sendMessageInTransaction(msg, arg);
+				
+			}
 
 			for (FlowListener listener : listeners)
 			{
