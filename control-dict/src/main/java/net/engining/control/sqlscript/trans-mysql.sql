@@ -67,14 +67,7 @@ F|处理失败
 	TRANS_VERSION varchar(50) COMMENT '交易版本号',
 	REQUEST_IP varchar(20) COMMENT '交易请求IP',
 	REQUEST_URL varchar(100) COMMENT '请求URL',
-	-- ///
-	-- U|待确认
-	-- C|确认已提交
-	-- R|确认回滚
-	CONFIRM_ST char(1) COMMENT '分布式事务状态 : ///
-U|待确认
-C|确认已提交
-R|确认回滚',
+	CONFIRM_COUNT int COMMENT '分布式事务确认次数',
 	CREATE_TIME timestamp DEFAULT NOW() NOT NULL COMMENT 'CREATE_TIME',
 	UPDATE_TIME timestamp DEFAULT NOW() NOT NULL COMMENT 'UPDATE_TIME',
 	BIZ_DATE date NOT NULL COMMENT '系统业务日期',
@@ -122,14 +115,7 @@ F|处理失败
 	TRANS_VERSION varchar(50) COMMENT '交易版本号',
 	REQUEST_IP varchar(20) COMMENT '交易请求IP',
 	REQUEST_URL varchar(100) COMMENT '请求URL',
-	-- ///
-	-- U|待确认
-	-- C|确认已提交
-	-- R|确认回滚
-	CONFIRM_ST char(1) COMMENT '分布式事务状态 : ///
-U|待确认
-C|确认已提交
-R|确认回滚',
+	CONFIRM_COUNT int COMMENT '分布式事务确认次数',
 	CREATE_TIME timestamp DEFAULT NOW() NOT NULL COMMENT 'CREATE_TIME',
 	UPDATE_TIME timestamp DEFAULT NOW() NOT NULL COMMENT 'UPDATE_TIME',
 	BIZ_DATE date NOT NULL COMMENT '系统业务日期',
