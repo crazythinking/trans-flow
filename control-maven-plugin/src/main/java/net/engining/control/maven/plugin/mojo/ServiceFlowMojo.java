@@ -143,7 +143,7 @@ public class ServiceFlowMojo extends AbstractMojo {
 						continue;
 					}
 
-					String flowCode = StringUtils.capitalize(info.getSimpleName());
+					String flowCode = StringUtils.capitalize(info.getName());
 					getLog().info(MessageFormat.format("开始构建FlowTrans的相关生成文件：[{0}]", flowCode));
 
 					if (flowListProperties.contains(flowCode)) {
