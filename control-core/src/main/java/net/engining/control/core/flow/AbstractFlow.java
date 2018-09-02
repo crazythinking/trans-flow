@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.rocketmq.common.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,9 +256,9 @@ public abstract class AbstractFlow implements InitializingBean
 				Preconditions.checkNotNull(msg.getTopic(), "RocketMq Transactional message must have topic");
 				Preconditions.checkNotNull(msg.getTags(), "RocketMq Transactional message must have tag");
 				Preconditions.checkNotNull(msg.getBody(), "RocketMq Transactional message must have body");
-				//唯一标识事务消息的key，通常用业务流水号
+				//唯一标识事务消息的key，通常用业务流水号；为确保幂等性，及能够显示出与原始交易的父子关系，其后加上“-[0,100]”
 				if(!serialId.equals(msg.getKeys())){
-					msg.setKeys(serialId);
+					msg.setKeys(serialId+"-"+RandomUtils.nextInt(0, 100));
 				}
 				// 使用spring.application.name作为SvPrId
 				Preconditions.checkNotNull(environment.getProperty("spring.application.name"), "spring.application.name must be set");

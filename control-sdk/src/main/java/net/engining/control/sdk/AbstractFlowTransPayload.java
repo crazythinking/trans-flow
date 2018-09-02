@@ -13,7 +13,7 @@ import net.engining.control.api.ContextKey;
 public abstract class AbstractFlowTransPayload {
 
 	/**
-	 * Flow定义的Code，默认可以用Flow定义类名的骆驼命名作为Code；由生成插件产生；
+	 * Flow定义的Code，默认用Flow定义类名的骆驼命名作为Code；由生成插件产生；
 	 */
 	private String code;
 

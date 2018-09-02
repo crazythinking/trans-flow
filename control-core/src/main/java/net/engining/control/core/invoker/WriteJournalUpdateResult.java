@@ -19,7 +19,8 @@ import net.engining.control.core.flow.FlowContext;
 import net.engining.control.entity.enums.TransStatusDef;
 import net.engining.control.entity.model.CtErrorJournal;
 import net.engining.control.entity.model.CtInboundJournal;
-import net.engining.pg.web.WebCommonResponse;
+import net.engining.pg.support.core.exception.ErrorCode;
+import net.engining.pg.support.utils.ExceptionUtilsExt;
 
 @InvokerDefinition(
 		name = "更新联机日志处理结果",
@@ -43,45 +44,48 @@ public class WriteJournalUpdateResult implements Invoker, Skippable {
 	@Override
 	public void invoke(FlowContext ctx) {
 
-		CtErrorJournal ctErrorJournal = new CtErrorJournal();
 		String transId = ctx.get(TransIdKey.class);
 		CtInboundJournal ctInboundJournal = em.find(CtInboundJournal.class, transId);
-		String responseMsg = null;
 		ResponseData responseData = ctx.get(ResponseDataKey.class);
-		/**
+		
+		/*
 		 * 判断response是否存在
 		 * 1、response存在会出现交易异常
 		 * 2、response不存在会出现系统异常，或者本身没有下游系统
 		 */
+		CtErrorJournal ctErrorJournal = new CtErrorJournal();
 		if (responseData != null) {
-			responseMsg = JSON.toJSONString(responseData.getReturnData());
-			if (responseData.getReturnCode().equals(WebCommonResponse.CODE_OK)) {
+			if (responseData.getReturnCode().equals(ErrorCode.Success.getValue())) {
 				ctInboundJournal.setTransStatus(TransStatusDef.S);
-				ctInboundJournal.setRequestMsg(responseMsg);
-			} else {
+				ctInboundJournal.setRequestMsg(JSON.toJSONString(responseData.getReturnData()));
+			} 
+			else {
 				ctInboundJournal.setTransStatus(TransStatusDef.F);
+				
 				ctErrorJournal.setErrorCode(responseData.getReturnCode());
 				ctErrorJournal.setErrorReason(responseData.getReturnDesc());
 				ctErrorJournal.setInboundId(ctInboundJournal.getInboundId());
-				ctErrorJournal.setCreateTime(ctInboundJournal.getCreateTime());
-				ctErrorJournal.setUpdateTime(ctInboundJournal.getUpdateTime());
-				ctErrorJournal.setJpaVersion(ctInboundJournal.getJpaVersion());
 				if(ctx.getLastException()!=null) {
-					ctErrorJournal.setExceptionRec(ctx.getLastException().getMessage());
+					ctErrorJournal.setExceptionRec(ExceptionUtilsExt.getStackTrace(ctx.getLastException().getCause()));
 				}
+				ctErrorJournal.fillDefaultValues();
 				em.persist(ctErrorJournal);
 			}
-		} else {
+		} 
+		else {
 			FinalResult resultFlag = ctx.get(FinalResultKey.class);
 
 			if (resultFlag.equals(FinalResult.Success)) {
 				ctInboundJournal.setTransStatus(TransStatusDef.S);
-			} else {
+			} 
+			else {
 				ctInboundJournal.setTransStatus(TransStatusDef.F);
+				
 				ctErrorJournal.setInboundId(ctInboundJournal.getInboundId());
-				ctErrorJournal.setCreateTime(ctInboundJournal.getCreateTime());
-				ctErrorJournal.setUpdateTime(ctInboundJournal.getUpdateTime());
-				ctErrorJournal.setJpaVersion(ctInboundJournal.getJpaVersion());
+				if(ctx.getLastException()!=null) {
+					ctErrorJournal.setExceptionRec(ExceptionUtilsExt.getStackTrace(ctx.getLastException().getCause()));
+				}
+				ctErrorJournal.fillDefaultValues();
 				if(ctx.getLastException()!=null) {
 					ctErrorJournal.setExceptionRec(ctx.getLastException().getMessage());
 				}

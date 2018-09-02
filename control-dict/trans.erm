@@ -135,7 +135,7 @@
 			</connections>
 			<display>false</display>
 			<creation_date>2018-03-15 15:55:56</creation_date>
-			<updated_date>2018-08-31 18:30:09</updated_date>
+			<updated_date>2018-09-01 14:13:56</updated_date>
 			<model_property>
 				<name>Project Name</name>
 				<value></value>
@@ -542,7 +542,7 @@
 		</word>
 		<word>
 			<id>23</id>
-			<length>10</length>
+			<length>2</length>
 			<decimal>null</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>
@@ -558,7 +558,7 @@
 		</word>
 		<word>
 			<id>24</id>
-			<length>50</length>
+			<length>10</length>
 			<decimal>null</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>
@@ -590,7 +590,7 @@
 		</word>
 		<word>
 			<id>26</id>
-			<length>30</length>
+			<length>64</length>
 			<decimal>null</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>

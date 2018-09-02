@@ -60,8 +60,9 @@ public class CommonRocketMqTransactionalProducer extends AbstractMQTransactionPr
 			Map<String, Serializable> argMap = (Map<String, Serializable>) arg;
 			
 			// 插入交易流水表作为回查数据，与业务操作在同一个本地事务内
-			// 如果数据操作失败，需要回滚，返回RocketMQ一个失败消息ROLLBACK_MESSAGE，意味着 消费者无法消费到这条失败的消息
+			// 如果数据操作失败，需要回滚，会返回RocketMQ一个失败消息ROLLBACK_MESSAGE，意味着 消费者无法消费到这条失败的消息
 			// 如果成功，就要返回rocketMQ成功的消息COMMIT_MESSAGE，意味着消费者将读取到这条消息
+			// TODO 考虑重试事务消息时的逻辑，直接更新该条事务交易流水
 			CtInboundJournal ctInboundJournal = new CtInboundJournal();
 			ctInboundJournal.setAsynInd(AsynInd.A);
 			//根据RocketMQ Producer最佳实践，一个应用只用一个Topic，故使用topic作为标识自身的标志
@@ -78,6 +79,7 @@ public class CommonRocketMqTransactionalProducer extends AbstractMQTransactionPr
 			//ctInboundJournal.setTransVersion(msg.getUserProperty(TxnVersionKey.class.getCanonicalName()));
 			ctInboundJournal.setTxnDatetime(new Date());
 			ctInboundJournal.setTxnSerialNo(msg.getKeys());
+			ctInboundJournal.setMqMsgId(msg.getTransactionId());
 			ctInboundJournal.fillDefaultValues();
 			em.persist(ctInboundJournal);
 			
