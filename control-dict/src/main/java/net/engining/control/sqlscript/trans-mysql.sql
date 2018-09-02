@@ -36,7 +36,7 @@ CREATE TABLE CT_INBOUND_JOURNAL
 	SV_PR_ID varchar(10) NOT NULL COMMENT '服务提供系统标识',
 	CHANNEL_ID varchar(10) NOT NULL COMMENT '渠道ID(请求系统标识)',
 	TG_BIZ_DATE date COMMENT '对方系统业务日期',
-	TXN_SERIAL_NO varchar(30) NOT NULL COMMENT '交易流水号',
+	TXN_SERIAL_NO varchar(64) NOT NULL COMMENT '交易流水号',
 	TXN_DATETIME timestamp DEFAULT NOW() NOT NULL COMMENT '交易时间',
 	SIGN_TOKEN varchar(500) COMMENT '签名TOKEN',
 	-- ///
@@ -52,7 +52,7 @@ CREATE TABLE CT_INBOUND_JOURNAL
 	-- S|处理成功
 	-- F|处理失败
 	-- 
-	TRANS_STATUS varchar(10) COMMENT '交易状态 : ///
+	TRANS_STATUS varchar(2) COMMENT '交易状态 : ///
 P|待处理
 R|重试中
 D|批量处理中
@@ -64,7 +64,7 @@ F|处理失败
 	PROCESS_TIME timestamp DEFAULT NOW() NOT NULL COMMENT '系统处理请求时间',
 	MQ_MSG_ID varchar(50) COMMENT 'MQ_MSG_ID',
 	RETRY_COUNT int COMMENT '重试次数',
-	TRANS_VERSION varchar(50) COMMENT '交易版本号',
+	TRANS_VERSION varchar(10) COMMENT '交易版本号',
 	REQUEST_IP varchar(20) COMMENT '交易请求IP',
 	REQUEST_URL varchar(100) COMMENT '请求URL',
 	CONFIRM_COUNT int COMMENT '分布式事务确认次数',
@@ -84,7 +84,7 @@ CREATE TABLE CT_INBOUND_JOURNAL_HST
 	SV_PR_ID varchar(10) NOT NULL COMMENT '服务提供系统标识',
 	CHANNEL_ID varchar(10) NOT NULL COMMENT '渠道ID(请求系统标识)',
 	TG_BIZ_DATE date COMMENT '对方系统业务日期',
-	TXN_SERIAL_NO varchar(30) NOT NULL COMMENT '交易流水号',
+	TXN_SERIAL_NO varchar(64) NOT NULL COMMENT '交易流水号',
 	TXN_DATETIME timestamp DEFAULT NOW() NOT NULL COMMENT '交易时间',
 	SIGN_TOKEN varchar(500) COMMENT '签名TOKEN',
 	-- ///
@@ -100,7 +100,7 @@ CREATE TABLE CT_INBOUND_JOURNAL_HST
 	-- S|处理成功
 	-- F|处理失败
 	-- 
-	TRANS_STATUS varchar(10) NOT NULL COMMENT '交易状态 : ///
+	TRANS_STATUS varchar(2) NOT NULL COMMENT '交易状态 : ///
 P|待处理
 R|重试中
 D|批量处理中
@@ -112,7 +112,7 @@ F|处理失败
 	PROCESS_TIME timestamp DEFAULT NOW() NOT NULL COMMENT '系统处理请求时间',
 	MQ_MSG_ID varchar(50) COMMENT 'MQ_MSG_ID',
 	RETRY_COUNT int COMMENT '重试次数',
-	TRANS_VERSION varchar(50) COMMENT '交易版本号',
+	TRANS_VERSION varchar(10) COMMENT '交易版本号',
 	REQUEST_IP varchar(20) COMMENT '交易请求IP',
 	REQUEST_URL varchar(100) COMMENT '请求URL',
 	CONFIRM_COUNT int COMMENT '分布式事务确认次数',
