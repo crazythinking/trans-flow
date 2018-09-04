@@ -46,6 +46,7 @@ import net.engining.pg.support.utils.ValidateUtilExt;
 	}
 )
 public class WriteInboundJournal implements Invoker, Skippable {
+	
 	@PersistenceContext 
 	private EntityManager em;
 	
