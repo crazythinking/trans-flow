@@ -38,7 +38,7 @@ public class SimpleFlowDispatcher implements FlowDispatcher, InitializingBean {
 	public Map<Class<? extends ContextKey<?>>, Object> process(String flowCode, Map<Class<? extends ContextKey<?>>, Object> request) {
 		AbstractFlow flowTrans = flowMap.get(flowCode);
 		// TODO 改为签名判断，主要是考虑安全性，具体怎么用，还没想清楚
-		checkNotNull(flowTrans);
+		checkNotNull(flowTrans, "flowTrans不可为空，存在异常");
 		return flowTrans.execute(flowCode, request);
 	}
 	
@@ -55,7 +55,7 @@ public class SimpleFlowDispatcher implements FlowDispatcher, InitializingBean {
 			String code = fd.code();
 			if (StringUtils.isBlank(code))
 			{
-				code = clazz.getSimpleName();
+				code = clazz.getName();
 			}
 			
 			if (map.containsKey(code))

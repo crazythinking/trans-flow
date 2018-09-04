@@ -143,7 +143,8 @@ public class ServiceFlowMojo extends AbstractMojo {
 						continue;
 					}
 
-					String flowCode = StringUtils.capitalize(info.getName());
+					String flowCode = StringUtils.capitalize(info.getSimpleName());
+					String flowCodeFullName = info.getName();
 					getLog().info(MessageFormat.format("开始构建FlowTrans的相关生成文件：[{0}]", flowCode));
 
 					if (flowListProperties.contains(flowCode)) {
@@ -285,13 +286,13 @@ public class ServiceFlowMojo extends AbstractMojo {
 					// 开始生成FlowTrans对应的Request类
 					String requestName = basePackage + relativePackage + "." + flowCode + "Request";
 					getLog().debug("构建Request类：" + requestName);
-					TopLevelClass request = createWrapper(requestName, fd, flowCode, requires, optional);
+					TopLevelClass request = createWrapper(requestName, fd, flowCodeFullName, requires, optional);
 					outputClass(request, r);
 					
 					// 开始生成FlowTrans对应的Response类
 					String responseName = basePackage + relativePackage + "." + flowCode + "Response";
 					getLog().debug("构建Response类：" + responseName);
-					TopLevelClass response = createWrapper(responseName, fd, flowCode, Sets.newHashSet(fd.response()), null);
+					TopLevelClass response = createWrapper(responseName, fd, flowCodeFullName, Sets.newHashSet(fd.response()), null);
 					outputClass(response, r);
 
 					// 构建Request Sample文件

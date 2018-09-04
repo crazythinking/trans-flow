@@ -22,6 +22,7 @@ public @interface FlowDefinition {
 	 * 编码
 	 * @return
 	 */
+	@Deprecated
 	String code() default "";
 	
 	/**
