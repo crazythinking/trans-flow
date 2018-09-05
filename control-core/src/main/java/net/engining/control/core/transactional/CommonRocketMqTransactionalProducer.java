@@ -90,7 +90,7 @@ public class CommonRocketMqTransactionalProducer extends AbstractMQTransactionPr
 		catch (Exception e) {
 			//到这里half-message已经发送，事务成功就应该返回事务消息成功
 			log.error("transaction message key: {}===> 本地事务执行失败", msg.getKeys());
-			ExceptionUtilsExt.dump(e.getCause());
+			ExceptionUtilsExt.dump(e);
 			throw new ErrorMessageException(ErrorCode.SystemError, "transaction message key: {}===> 本地事务执行失败");
 
 		}
