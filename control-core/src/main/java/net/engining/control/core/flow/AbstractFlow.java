@@ -191,14 +191,17 @@ public abstract class AbstractFlow implements InitializingBean
 			}
 			catch (RuntimeException e)
 			{
-				logger.error("执行{}时出现，RuntimeException:事务回滚[{}:{}]", flowCode, e.getClass().getCanonicalName(), e.getMessage());
-				ExceptionUtilsExt.dump(e);
+				// 不需要了，在listener内打印error日志
+				// logger.error("出现RuntimeException:事务回滚[{}:{}]",
+				// e.getClass().getCanonicalName(), e.getMessage());
+				// ExceptionUtilsExt.dump(e);
 				context.addLastExceptions(e);
 			}
 			catch (Exception e)//@Transactional 默认只对RuntimeException进行回滚
 			{
-				logger.error("执行{}时出现，Checked Exception:事务提交[{}:{}]", flowCode, e.getClass().getCanonicalName(), e.getMessage());
-				ExceptionUtilsExt.dump(e);
+				// logger.error("出现Checked Exception:事务提交[{}:{}]",
+				// e.getClass().getCanonicalName(), e.getMessage());
+				// ExceptionUtilsExt.dump(e);
 				context.addLastExceptions(e);
 			}
 		}

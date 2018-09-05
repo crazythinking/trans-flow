@@ -12,6 +12,7 @@ import net.engining.control.api.ContextKey;
 import net.engining.control.core.flow.FlowContext;
 import net.engining.control.core.flow.FlowDefinition;
 import net.engining.control.core.invoker.InvokerDefinition;
+import net.engining.pg.support.utils.ExceptionUtilsExt;
 
 /**
  * FlowTrans的监听类，主要从FlowTrans执行的前后，以及其内部各Invoker执行的前后，增强处理
@@ -35,7 +36,7 @@ public class DetailedFlowListener implements FlowListener {
 	/**
 	 * Invoker执行过程中的上下文属性
 	 */
-	private boolean dumpProcedure = false;
+	private boolean dumpProcedure = true;
 	
 	@Override
 	public void beforeFlow(String flowCode, FlowDefinition definition, FlowContext context){
@@ -57,6 +58,7 @@ public class DetailedFlowListener implements FlowListener {
 		if(Optional.fromNullable(context.getLastExceptions()).isPresent()){
 			for(Exception ex: context.getLastExceptions()){
 				logger.error("执行过程中存在异常：[{}:{}]", ex.getClass().getCanonicalName(), ex.getMessage());
+				ExceptionUtilsExt.dump(ex);
 			}
 		}
 	}

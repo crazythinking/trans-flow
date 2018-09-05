@@ -6,6 +6,11 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+
+import com.google.common.base.Preconditions;
+
 import net.engining.control.api.key.AsynIndKey;
 import net.engining.control.api.key.ChannelKey;
 import net.engining.control.api.key.ChannelRequestSeqKey;
@@ -26,13 +31,13 @@ import net.engining.pg.support.utils.ValidateUtilExt;
 @InvokerDefinition(
 	name = "记录网关接收的交易流水",
 	requires = {
-			SvPrIdKey.class,
 			ChannelKey.class,
 			OnlineDataKey.class,
 			ChannelRequestSeqKey.class,
 			AsynIndKey.class,
 	},
 	optional = {
+			SvPrIdKey.class,
 			RequestIpKey.class,
 			RequestUrlKey.class,
 			ChannelSignTokenKey.class,
@@ -50,11 +55,23 @@ public class WriteInboundJournal implements Invoker, Skippable {
 	@PersistenceContext 
 	private EntityManager em;
 	
+	@Autowired
+	private Environment environment;
+	
 	@Override
 	public void invoke(FlowContext ctx) {
+		Preconditions.checkNotNull(environment.getProperty("spring.application.name"), "spring.application.name must be set");
+		
 		// 插入交易流水表	
 		CtInboundJournal ctInboundJournal = new CtInboundJournal();
-		ctInboundJournal.setSvPrId(ctx.get(SvPrIdKey.class));//TODO 默认用spring.application.name
+		if(ValidateUtilExt.isNotNullOrEmpty(ctx.get(SvPrIdKey.class))){
+			ctInboundJournal.setSvPrId(ctx.get(SvPrIdKey.class));
+		}
+		else {
+			// 默认用spring.application.name
+			ctInboundJournal.setSvPrId(environment.getProperty("spring.application.name"));
+		}
+		
 		ctInboundJournal.setTxnSerialNo(ctx.get(ChannelRequestSeqKey.class));
 		ctInboundJournal.setChannelId(ctx.get(ChannelKey.class));
 		ctInboundJournal.setAsynInd(ctx.get(AsynIndKey.class));
