@@ -27,17 +27,18 @@ import net.engining.control.core.flow.FlowContext;
 import net.engining.control.entity.enums.TransStatusDef;
 import net.engining.control.entity.model.CtInboundJournal;
 import net.engining.pg.support.utils.ValidateUtilExt;
+import net.engining.pg.web.AsynInd;
 
 @InvokerDefinition(
 	name = "记录网关接收的交易流水",
 	requires = {
-			ChannelKey.class,
 			OnlineDataKey.class,
 			ChannelRequestSeqKey.class,
-			AsynIndKey.class,
 	},
 	optional = {
 			SvPrIdKey.class,
+			ChannelKey.class,
+			AsynIndKey.class,
 			RequestIpKey.class,
 			RequestUrlKey.class,
 			ChannelSignTokenKey.class,
@@ -71,10 +72,22 @@ public class WriteInboundJournal implements Invoker, Skippable {
 			// 默认用spring.application.name
 			ctInboundJournal.setSvPrId(environment.getProperty("spring.application.name"));
 		}
-		
 		ctInboundJournal.setTxnSerialNo(ctx.get(ChannelRequestSeqKey.class));
-		ctInboundJournal.setChannelId(ctx.get(ChannelKey.class));
-		ctInboundJournal.setAsynInd(ctx.get(AsynIndKey.class));
+		if(ValidateUtilExt.isNotNullOrEmpty(ctx.get(ChannelKey.class))){
+			ctInboundJournal.setChannelId(ctx.get(ChannelKey.class));
+		}
+		else {
+			// 默认用Unknow
+			ctInboundJournal.setChannelId("Unknow");
+		}
+		if(ValidateUtilExt.isNotNullOrEmpty(ctx.get(AsynIndKey.class))){
+			ctInboundJournal.setAsynInd(ctx.get(AsynIndKey.class));
+		}
+		else {
+			// 默认用AsynInd.S|同步
+			ctInboundJournal.setAsynInd(AsynInd.S);
+		}
+		
 		ctInboundJournal.setTransStatus(TransStatusDef.P);
 		ctInboundJournal.setRequestMsg(ctx.get(OnlineDataKey.class));
 		ctInboundJournal.setTransCode(ctx.getFlowCode());
