@@ -19,6 +19,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -40,6 +41,9 @@ import net.engining.control.core.invoker.Skippable;
 import net.engining.control.core.invoker.TransactionSeperator;
 import net.engining.control.core.transactional.CommonRocketMqTransactionalProducer;
 import net.engining.pg.support.core.context.ApplicationContextHolder;
+import net.engining.pg.support.core.exception.ErrorCode;
+import net.engining.pg.support.core.exception.ErrorMessageException;
+import net.engining.pg.support.utils.ExceptionUtilsExt;
 
 /**
  * FlowTrans的Flow抽象，主要用于对FlowTrans中定义的Invoker按事务分隔分组，并依次调用执行
@@ -109,6 +113,7 @@ public abstract class AbstractFlow implements InitializingBean
 		}
 
 		invokerRequires = builder.build();
+		logger.debug("Trans Flow: {[]}的必输字段{}", flowDefinition.desc(), JSON.toJSONString(invokerRequires));
 
 		// 建立专用的invoker实例，每个FlowTrans一套
 		invokers = Lists.newArrayList();
@@ -163,6 +168,9 @@ public abstract class AbstractFlow implements InitializingBean
 
 		// 放入参数
 		String[] parameters = flowDefinition.parameters();
+		if(parameters.length % 2 != 0){
+			throw new ErrorMessageException(ErrorCode.CheckError, "FlowDefinition定义的parameters必须成对出现，详见parameters的注释");
+		}
 		HashMap<String, String> paramMap = new HashMap<String, String>();
 		for (int i = 0; i < parameters.length; i += 2) {
 			paramMap.put(parameters[i], parameters[i + 1]);
@@ -183,13 +191,15 @@ public abstract class AbstractFlow implements InitializingBean
 			}
 			catch (RuntimeException e)
 			{
-				logger.warn("RuntimeException:事务回滚[{}]", e.getClass().getCanonicalName());
-				context.setLastException(e);
+				logger.error("执行{}时出现，RuntimeException:事务回滚[{}:{}]", flowCode, e.getClass().getCanonicalName(), e.getMessage());
+				ExceptionUtilsExt.dump(e);
+				context.addLastExceptions(e);
 			}
 			catch (Exception e)//@Transactional 默认只对RuntimeException进行回滚
 			{
-				logger.warn("Checked Exception:事务提交[{}]", e.getClass().getCanonicalName());
-				context.setLastException(e);
+				logger.error("执行{}时出现，Checked Exception:事务提交[{}:{}]", flowCode, e.getClass().getCanonicalName(), e.getMessage());
+				ExceptionUtilsExt.dump(e);
+				context.addLastExceptions(e);
 			}
 		}
 		

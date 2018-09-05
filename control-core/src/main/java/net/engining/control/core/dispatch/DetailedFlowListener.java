@@ -1,7 +1,5 @@
 package net.engining.control.core.dispatch;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,9 +54,10 @@ public class DetailedFlowListener implements FlowListener {
 			dumpContext("输出的上下文", context);
 		}
 		
-		if(Optional.fromNullable(context.getLastException()).isPresent()){
-			logger.error("存在异常：[{}]", context.getLastException().getMessage());
-			dump(context.getLastException().getCause());
+		if(Optional.fromNullable(context.getLastExceptions()).isPresent()){
+			for(Exception ex: context.getLastExceptions()){
+				logger.error("执行过程中存在异常：[{}:{}]", ex.getClass().getCanonicalName(), ex.getMessage());
+			}
 		}
 	}
 
@@ -86,16 +85,6 @@ public class DetailedFlowListener implements FlowListener {
 		}
 	}
 
-	private void dump(Throwable t){
-		StringWriter stringWriter = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(stringWriter);
-		if(Optional.fromNullable(t).isPresent()){
-			t.printStackTrace(printWriter);
-			logger.error(StringUtils.CR+StringUtils.LF+stringWriter.toString()+StringUtils.CR+StringUtils.LF);
-		}
-		
-	}
-	
 	private void dumpContext(String title, FlowContext context)
 	{
 		StringBuilder sb = new StringBuilder();

@@ -9,9 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import net.engining.control.api.FinalResult;
-import net.engining.control.api.ResponseData;
+import net.engining.control.api.ResponseData;import net.engining.control.api.key.ErrorMessagesKey;
 import net.engining.control.api.key.FinalResultKey;
 import net.engining.control.api.key.ResponseDataKey;
 import net.engining.control.api.key.TransIdKey;
@@ -21,6 +22,7 @@ import net.engining.control.entity.model.CtErrorJournal;
 import net.engining.control.entity.model.CtInboundJournal;
 import net.engining.pg.support.core.exception.ErrorCode;
 import net.engining.pg.support.utils.ExceptionUtilsExt;
+import net.engining.pg.support.utils.ValidateUtilExt;
 
 @InvokerDefinition(
 		name = "更新联机日志处理结果",
@@ -28,7 +30,8 @@ import net.engining.pg.support.utils.ExceptionUtilsExt;
 				TransIdKey.class
 			}, 
 		optional = {
-				ResponseDataKey.class
+				ResponseDataKey.class,
+				ErrorMessagesKey.class
 			}, 
 		results = {
 				ResponseDataKey.class
@@ -47,7 +50,6 @@ public class WriteJournalUpdateResult implements Invoker, Skippable {
 		String transId = ctx.get(TransIdKey.class);
 		CtInboundJournal ctInboundJournal = em.find(CtInboundJournal.class, transId);
 		ResponseData responseData = ctx.get(ResponseDataKey.class);
-		
 		/*
 		 * 判断response是否存在
 		 * 1、response存在会出现交易异常
@@ -57,16 +59,19 @@ public class WriteJournalUpdateResult implements Invoker, Skippable {
 		if (responseData != null) {
 			if (responseData.getReturnCode().equals(ErrorCode.Success.getValue())) {
 				ctInboundJournal.setTransStatus(TransStatusDef.S);
-				ctInboundJournal.setRequestMsg(JSON.toJSONString(responseData.getReturnData()));
+				ctInboundJournal.setRequestMsg(JSON.toJSONString(responseData));
 			} 
 			else {
 				ctInboundJournal.setTransStatus(TransStatusDef.F);
+				ctInboundJournal.setRequestMsg(JSON.toJSONString(responseData));
 				
+				//记录异常
 				ctErrorJournal.setErrorCode(responseData.getReturnCode());
 				ctErrorJournal.setErrorReason(responseData.getReturnDesc());
 				ctErrorJournal.setInboundId(ctInboundJournal.getInboundId());
-				if(ctx.getLastException()!=null) {
-					ctErrorJournal.setExceptionRec(ExceptionUtilsExt.getStackTrace(ctx.getLastException().getCause()));
+				if(ValidateUtilExt.isNotNullOrEmpty(ctx.getLastExceptions())) {
+					Map<ErrorCode, String> errors = ctx.get(ErrorMessagesKey.class);
+					ctErrorJournal.setExceptionRec(JSON.toJSONString(errors));
 				}
 				ctErrorJournal.fillDefaultValues();
 				em.persist(ctErrorJournal);
@@ -81,14 +86,13 @@ public class WriteJournalUpdateResult implements Invoker, Skippable {
 			else {
 				ctInboundJournal.setTransStatus(TransStatusDef.F);
 				
+				//记录异常
 				ctErrorJournal.setInboundId(ctInboundJournal.getInboundId());
-				if(ctx.getLastException()!=null) {
-					ctErrorJournal.setExceptionRec(ExceptionUtilsExt.getStackTrace(ctx.getLastException().getCause()));
+				if(ValidateUtilExt.isNotNullOrEmpty(ctx.getLastExceptions())) {
+					Map<ErrorCode, String> errors = ctx.get(ErrorMessagesKey.class);
+					ctErrorJournal.setExceptionRec(JSON.toJSONString(errors));
 				}
 				ctErrorJournal.fillDefaultValues();
-				if(ctx.getLastException()!=null) {
-					ctErrorJournal.setExceptionRec(ctx.getLastException().getMessage());
-				}
 				em.persist(ctErrorJournal);
 			}
 		}

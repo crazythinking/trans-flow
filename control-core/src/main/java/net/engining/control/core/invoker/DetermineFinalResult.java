@@ -9,6 +9,7 @@ import net.engining.control.api.key.FinalResultKey;
 import net.engining.control.core.flow.FlowContext;
 import net.engining.pg.support.core.exception.ErrorCode;
 import net.engining.pg.support.core.exception.ErrorMessageException;
+import net.engining.pg.support.utils.ValidateUtilExt;
 
 @InvokerDefinition(
 	name = "结果处理",
@@ -24,18 +25,19 @@ public class DetermineFinalResult implements Invoker {
 	@Override
 	public void invoke(FlowContext ctx)
 	{
-		if (ctx.getLastException() != null)
+		if (ValidateUtilExt.isNotNullOrEmpty(ctx.getLastExceptions()))
 		{
 			ctx.put(FinalResultKey.class, FinalResult.Failed);
 
-			Exception e = ctx.getLastException();
-			if (e instanceof ErrorMessageException)
-			{
-				ctx.putMap(ErrorMessagesKey.class, ((ErrorMessageException) e).getErrorCode(), e.getMessage());
-			}
-			else
-			{
-				ctx.putMap(ErrorMessagesKey.class, ErrorCode.SystemError, ctx.getLastException().getMessage());
+			for(Exception e : ctx.getLastExceptions()){
+				if (e instanceof ErrorMessageException)
+				{
+					ctx.putMap(ErrorMessagesKey.class, ((ErrorMessageException) e).getErrorCode(), e.getClass().getCanonicalName()+":"+e.getMessage());
+				}
+				else
+				{
+					ctx.putMap(ErrorMessagesKey.class, ErrorCode.SystemError, e.getClass().getCanonicalName()+":"+e.getMessage());
+				}
 			}
 		}
 		else
@@ -50,10 +52,10 @@ public class DetermineFinalResult implements Invoker {
 				{
 					ctx.put(FinalResultKey.class, FinalResult.Success);
 				}
-			}else{
-				if(ctx.get(FinalResultKey.class).equals(FinalResult.Failed) &&
-						ctx.getLastException() == null ){
-					ctx.putMap(ErrorMessagesKey.class, ErrorCode.SystemError, "系统内部错误");
+			}
+			else{
+				if(ctx.get(FinalResultKey.class).equals(FinalResult.Failed)){
+					ctx.putMap(ErrorMessagesKey.class, ErrorCode.UnknowFail, ErrorCode.UnknowFail.getLabel());
 				}
 			}
 		}

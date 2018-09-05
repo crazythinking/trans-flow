@@ -57,9 +57,9 @@ public class FlowContext {
 	private Map<String, String> parameters;
 
 	/**
-	 * 执行过程中最终产生的异常
+	 * 执行过程中最终产生的异常堆栈
 	 */
-	private Exception lastException;
+	private List<Exception> lastExceptions = Lists.newArrayList();
 
 	/**
 	 * 上下文属性对应的ContextKey
@@ -179,12 +179,18 @@ public class FlowContext {
 		this.flowDesc = flowDesc;
 	}
 
-	public Exception getLastException() {
-		return lastException;
+	/**
+	 * @return the lastExceptions
+	 */
+	public List<Exception> getLastExceptions() {
+		return lastExceptions;
 	}
 
-	public void setLastException(Exception lastException) {
-		this.lastException = lastException;
+	/**
+	 * @param lastExceptions the lastExceptions to set
+	 */
+	public void addLastExceptions(Exception lastException) {
+		this.lastExceptions.add(lastException);
 	}
 
 }
