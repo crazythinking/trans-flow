@@ -65,13 +65,13 @@ public class WriteInboundJournal implements Invoker, Skippable {
 		
 		// 插入交易流水表	
 		CtInboundJournal ctInboundJournal = new CtInboundJournal();
-		if(ValidateUtilExt.isNotNullOrEmpty(ctx.get(SvPrIdKey.class))){
-			ctInboundJournal.setSvPrId(ctx.get(SvPrIdKey.class));
-		}
-		else {
+//		if(ValidateUtilExt.isNotNullOrEmpty(ctx.get(SvPrIdKey.class))){
+//			ctInboundJournal.setSvPrId(ctx.get(SvPrIdKey.class));
+//		}
+//		else {
 			// 默认用spring.application.name
 			ctInboundJournal.setSvPrId(environment.getProperty("spring.application.name"));
-		}
+//		}
 		ctInboundJournal.setTxnSerialNo(ctx.get(ChannelRequestSeqKey.class));
 		if(ValidateUtilExt.isNotNullOrEmpty(ctx.get(ChannelKey.class))){
 			ctInboundJournal.setChannelId(ctx.get(ChannelKey.class));

@@ -33,7 +33,7 @@ CREATE TABLE CT_INBOUND_JOURNAL
 (
 	-- ###uuid2###
 	INBOUND_ID varchar(64) NOT NULL COMMENT '序号编号 : ###uuid2###',
-	SV_PR_ID varchar(10) NOT NULL COMMENT '服务提供系统标识',
+	SV_PR_ID varchar(50) NOT NULL COMMENT '服务提供系统标识',
 	CHANNEL_ID varchar(10) NOT NULL COMMENT '渠道ID(请求系统标识)',
 	TG_BIZ_DATE date COMMENT '对方系统业务日期',
 	TXN_SERIAL_NO varchar(64) NOT NULL COMMENT '交易流水号',
@@ -81,7 +81,7 @@ F|处理失败
 CREATE TABLE CT_INBOUND_JOURNAL_HST
 (
 	INBOUND_ID varchar(64) NOT NULL COMMENT '序号编号',
-	SV_PR_ID varchar(10) NOT NULL COMMENT '服务提供系统标识',
+	SV_PR_ID varchar(50) NOT NULL COMMENT '服务提供系统标识',
 	CHANNEL_ID varchar(10) NOT NULL COMMENT '渠道ID(请求系统标识)',
 	TG_BIZ_DATE date COMMENT '对方系统业务日期',
 	TXN_SERIAL_NO varchar(64) NOT NULL COMMENT '交易流水号',
