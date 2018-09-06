@@ -9,10 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import net.engining.control.api.FinalResult;
-import net.engining.control.api.ResponseData;import net.engining.control.api.key.ErrorMessagesKey;
+import net.engining.control.api.ResponseData;
+import net.engining.control.api.key.ErrorMessagesKey;
 import net.engining.control.api.key.FinalResultKey;
 import net.engining.control.api.key.ResponseDataKey;
 import net.engining.control.api.key.TransIdKey;
@@ -21,7 +21,6 @@ import net.engining.control.entity.enums.TransStatusDef;
 import net.engining.control.entity.model.CtErrorJournal;
 import net.engining.control.entity.model.CtInboundJournal;
 import net.engining.pg.support.core.exception.ErrorCode;
-import net.engining.pg.support.utils.ExceptionUtilsExt;
 import net.engining.pg.support.utils.ValidateUtilExt;
 
 @InvokerDefinition(
@@ -59,11 +58,11 @@ public class WriteJournalUpdateResult implements Invoker, Skippable {
 		if (responseData != null) {
 			if (responseData.getReturnCode().equals(ErrorCode.Success.getValue())) {
 				ctInboundJournal.setTransStatus(TransStatusDef.S);
-				ctInboundJournal.setRequestMsg(JSON.toJSONString(responseData));
+				ctInboundJournal.setResponseMsg(JSON.toJSONString(responseData));
 			} 
 			else {
 				ctInboundJournal.setTransStatus(TransStatusDef.F);
-				ctInboundJournal.setRequestMsg(JSON.toJSONString(responseData));
+				ctInboundJournal.setResponseMsg(JSON.toJSONString(responseData));
 				
 				//记录异常
 				ctErrorJournal.setErrorCode(responseData.getReturnCode());
