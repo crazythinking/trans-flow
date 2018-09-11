@@ -1,5 +1,7 @@
 package net.engining.control.core.dispatch;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +14,8 @@ import net.engining.control.api.ContextKey;
 import net.engining.control.core.flow.FlowContext;
 import net.engining.control.core.flow.FlowDefinition;
 import net.engining.control.core.invoker.InvokerDefinition;
+import net.engining.pg.support.core.exception.ErrorCode;
+import net.engining.pg.support.core.exception.ErrorMessageException;
 import net.engining.pg.support.utils.ExceptionUtilsExt;
 
 /**
@@ -40,27 +44,37 @@ public class DetailedFlowListener implements FlowListener {
 	
 	@Override
 	public void beforeFlow(String flowCode, FlowDefinition definition, FlowContext context){
+		logger.info("开始交易流程[TRADE_TYPE:{}]", flowCode);
 		if (dumpRequest && logger.isDebugEnabled())
 		{
-			logger.debug("开始交易流程[{}]", flowCode);
 			dumpContext("输入的上下文", context);
 		}
 	}
 
 	@Override
 	public void afterFlow(String flowCode, FlowDefinition definition, FlowContext context) {
+		String stauts = "S";
+		if(Optional.fromNullable(context.getLastExceptions()).isPresent()){
+			stauts = "F";
+		}
+		logger.info("结束交易流程[TRADE_TYPE:{}, TRADE_STATUS:{}]", flowCode, stauts);
 		if (dumpResponse && logger.isDebugEnabled())
 		{
-			logger.debug("结束交易流程[{}]", flowCode);
 			dumpContext("输出的上下文", context);
 		}
 		
 		if(Optional.fromNullable(context.getLastExceptions()).isPresent()){
 			for(Exception ex: context.getLastExceptions()){
-				logger.error("执行过程中存在异常：[{}:{}]", ex.getClass().getCanonicalName(), ex.getMessage());
+				if(ex instanceof RuntimeException && !(ex instanceof ErrorMessageException)){//ErrorMessageException这类异常通常是业务检查异常，可以被监控忽略
+					logger.error("执行过程中存在异常：[{}:{}], ERROR_CODE:{} ", ex.getClass().getCanonicalName(), ex.getMessage(), ErrorCode.SystemError.getValue());
+				}
+				else{
+					logger.error("执行过程中存在异常：[{}:{}]", ex.getClass().getCanonicalName(), ex.getMessage());
+				}
 				ExceptionUtilsExt.dump(ex);
 			}
 		}
+		
 	}
 
 	@Override

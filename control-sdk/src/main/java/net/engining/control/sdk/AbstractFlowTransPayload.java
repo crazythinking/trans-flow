@@ -3,6 +3,9 @@ package net.engining.control.sdk;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import net.engining.control.api.ContextKey;
 
 /**
@@ -58,5 +61,5 @@ public abstract class AbstractFlowTransPayload {
 	public void setDataMap(Map<Class<? extends ContextKey<?>>, Object> dataMap) {
 		this.dataMap = dataMap;
 	}
-
+	
 }

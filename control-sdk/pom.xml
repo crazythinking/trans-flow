@@ -11,6 +11,14 @@
 	<name>Transaction Control - 软件开发包(SDK)</name>
 	<dependencies>
 		<dependency>
+			<groupId>net.engining.pg</groupId>
+			<artifactId>pg-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.engining.control</groupId>
 			<artifactId>control-api</artifactId>
 		</dependency>
