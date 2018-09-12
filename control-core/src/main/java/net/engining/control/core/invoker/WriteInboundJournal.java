@@ -1,7 +1,6 @@
 package net.engining.control.core.invoker;
 
 import java.util.Date;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,7 +29,7 @@ import net.engining.pg.support.utils.ValidateUtilExt;
 import net.engining.pg.web.AsynInd;
 
 @InvokerDefinition(
-	name = "记录网关接收的交易流水",
+	name = "记录联机交易日志流水",
 	requires = {
 			OnlineDataKey.class,
 			ChannelRequestSeqKey.class,
@@ -51,7 +50,7 @@ import net.engining.pg.web.AsynInd;
 		OnlineDataKey.class
 	}
 )
-public class WriteInboundJournal implements Invoker, Skippable {
+public class WriteInboundJournal implements Invoker {
 	
 	@PersistenceContext 
 	private EntityManager em;
@@ -72,6 +71,7 @@ public class WriteInboundJournal implements Invoker, Skippable {
 			// 默认用spring.application.name
 			ctInboundJournal.setSvPrId(environment.getProperty("spring.application.name"));
 //		}
+		//交易流水号必须唯一，确保交易幂等性，这里通过数据库确保唯一性
 		ctInboundJournal.setTxnSerialNo(ctx.get(ChannelRequestSeqKey.class));
 		if(ValidateUtilExt.isNotNullOrEmpty(ctx.get(ChannelKey.class))){
 			ctInboundJournal.setChannelId(ctx.get(ChannelKey.class));
@@ -117,15 +117,10 @@ public class WriteInboundJournal implements Invoker, Skippable {
 		
 		ctx.put(TransIdKey.class, ctInboundJournal.getInboundId());
 		ctx.put(OnlineDataKey.class, ctInboundJournal.getRequestMsg());
-	}
-
-	@Override
-	public boolean skippable(Map<String, String> parameters) {
-		String skip = parameters.get(FlowContext.CONS_PARAMETERS.SKIP.toString());
-		if(FlowContext.SKIP_TRUE.equals(skip)){
-			return true;
-		}
-		return false;
+		//记录流水日志通常必须成功的，所有要将成功状态传到后面步骤
+		ctx.getParameters().put(FlowContext.CONS_PARAMETERS.SUCCESS.toString(), FlowContext.CONS_PARAMETERS.SUCCESS.toString());
+		//FIXME 为兼容之前的判断，待后续重构
+		ctx.getParameters().put(FlowContext.CONS_PARAMETERS.SKIP.toString(), "NO_SKIP");
 	}
 
 }

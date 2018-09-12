@@ -113,7 +113,7 @@ public abstract class AbstractFlow implements InitializingBean
 		}
 
 		invokerRequires = builder.build();
-		logger.debug("Trans Flow: {[]}的必输字段{}", flowDefinition.desc(), JSON.toJSONString(invokerRequires));
+		logger.debug("Trans Flow: [{}]的必输字段{}", flowDefinition.desc(), JSON.toJSONString(invokerRequires));
 
 		// 建立专用的invoker实例，每个FlowTrans一套
 		invokers = Lists.newArrayList();

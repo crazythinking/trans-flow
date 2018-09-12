@@ -24,7 +24,7 @@ import net.engining.pg.support.core.exception.ErrorCode;
 import net.engining.pg.support.utils.ValidateUtilExt;
 
 @InvokerDefinition(
-		name = "更新联机日志处理结果",
+		name = "更新联机交易日志流水",
 		requires = {
 				TransIdKey.class
 			}, 
@@ -36,7 +36,7 @@ import net.engining.pg.support.utils.ValidateUtilExt;
 				ResponseDataKey.class
 			}
 		)
-public class WriteJournalUpdateResult implements Invoker, Skippable {
+public class WriteJournalUpdateResult implements Invoker {
 
 	private static final Logger log = LoggerFactory.getLogger(WriteJournalUpdateResult.class);
 
@@ -49,11 +49,7 @@ public class WriteJournalUpdateResult implements Invoker, Skippable {
 		String transId = ctx.get(TransIdKey.class);
 		CtInboundJournal ctInboundJournal = em.find(CtInboundJournal.class, transId);
 		ResponseData responseData = ctx.get(ResponseDataKey.class);
-		/*
-		 * 判断response是否存在
-		 * 1、response存在会出现交易异常
-		 * 2、response不存在会出现系统异常，或者本身没有下游系统
-		 */
+		
 		CtErrorJournal ctErrorJournal = new CtErrorJournal();
 		if (responseData != null) {
 			if (responseData.getReturnCode().equals(ErrorCode.Success.getValue())) {
@@ -95,15 +91,6 @@ public class WriteJournalUpdateResult implements Invoker, Skippable {
 				em.persist(ctErrorJournal);
 			}
 		}
-	}
-
-	@Override
-	public boolean skippable(Map<String, String> parameters) {
-		String skip = parameters.get(FlowContext.CONS_PARAMETERS.SKIP.toString());
-		if (FlowContext.SKIP_TRUE.equals(skip)) {
-			return true;
-		}
-		return false;
 	}
 
 }
