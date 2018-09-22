@@ -43,7 +43,6 @@ import net.engining.control.core.transactional.CommonRocketMqTransactionalProduc
 import net.engining.pg.support.core.context.ApplicationContextHolder;
 import net.engining.pg.support.core.exception.ErrorCode;
 import net.engining.pg.support.core.exception.ErrorMessageException;
-import net.engining.pg.support.utils.ExceptionUtilsExt;
 
 /**
  * FlowTrans的Flow抽象，主要用于对FlowTrans中定义的Invoker按事务分隔分组，并依次调用执行
@@ -260,11 +259,11 @@ public abstract class AbstractFlow implements InitializingBean
 			// 支持RocketMq分布式事务消息
 			if (invoker instanceof RocketMqTransactional)
 			{
-				((RocketMqTransactional) invoker).setupTransactionalMessage(context.getParameters());
-				Preconditions.checkNotNull(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG), "该invoker需要分布式事务支持，FlowContext.parameters中必须包含ROCKETMQ_TRANS_MSG");
-				Preconditions.checkNotNull(context.getParameters().get(FlowContext.CONS_PARAMETERS.TRANS_MSG_SERIALID), "该invoker需要分布式事务支持，FlowContext.parameters中必须包含TRANS_MSG_SERIALID");
-				Message msg = JSONObject.parseObject(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG), Message.class);
-				String serialId = context.getParameters().get(FlowContext.CONS_PARAMETERS.TRANS_MSG_SERIALID);
+				((RocketMqTransactional) invoker).convertTransactionalMessage(context.getParameters());
+				Preconditions.checkNotNull(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG.toString()), "该invoker需要分布式事务支持，FlowContext.parameters中必须包含ROCKETMQ_TRANS_MSG");
+				Preconditions.checkNotNull(context.getParameters().get(FlowContext.CONS_PARAMETERS.TRANS_MSG_SERIALID.toString()), "该invoker需要分布式事务支持，FlowContext.parameters中必须包含TRANS_MSG_SERIALID");
+				Message msg = JSONObject.parseObject(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG.toString()), Message.class);
+				String serialId = context.getParameters().get(FlowContext.CONS_PARAMETERS.TRANS_MSG_SERIALID.toString());
 				//检查message的基本消息，必须包含Topic，tag
 				Preconditions.checkNotNull(msg.getTopic(), "RocketMq Transactional message must have topic");
 				Preconditions.checkNotNull(msg.getTags(), "RocketMq Transactional message must have tag");
@@ -277,9 +276,9 @@ public abstract class AbstractFlow implements InitializingBean
 				Preconditions.checkNotNull(environment.getProperty("spring.application.name"), "spring.application.name must be set");
 				msg.putUserProperty(SvPrIdKey.class.getCanonicalName(), environment.getProperty("spring.application.name"));
 				msg.putUserProperty(TransCodeKey.class.getCanonicalName(), flowCode);
-//				msg.putUserProperty(TxnVersionKey.class.getCanonicalName(), environment.getProperty("info.version"));
+				msg.putUserProperty(TxnVersionKey.class.getCanonicalName(), environment.getProperty("info.version"));
 				
-				Map<String, Serializable> arg = JSONObject.parseObject(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG_ARG), Map.class);
+				Map<String, Serializable> arg = JSONObject.parseObject(context.getParameters().get(FlowContext.CONS_PARAMETERS.ROCKETMQ_TRANS_MSG_ARG.toString()), Map.class);
 				
 				CommonRocketMqTransactionalProducer commonRocketMqTransactionProducer = ApplicationContextHolder.getBean(CommonRocketMqTransactionalProducer.class);
 				// send transactional message

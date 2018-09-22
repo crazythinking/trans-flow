@@ -14,6 +14,6 @@ public interface RocketMqTransactional {
 	 * 设置支持分布式事务的消息对象到FlowContext.parameters
 	 * @param context 
 	 */
-	public void setupTransactionalMessage(Map<String, String> parameters);
+	public void convertTransactionalMessage(Map<String, String> parameters);
 
 }

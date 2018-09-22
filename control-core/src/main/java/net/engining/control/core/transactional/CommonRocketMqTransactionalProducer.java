@@ -29,12 +29,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import net.engining.control.api.key.SvPrIdKey;
 import net.engining.control.api.key.TargetBizDateKey;
 import net.engining.control.api.key.TransCodeKey;
+import net.engining.control.api.key.TxnVersionKey;
 import net.engining.control.entity.enums.TransStatusDef;
 import net.engining.control.entity.model.CtInboundJournal;
 import net.engining.control.entity.model.QCtInboundJournal;
 import net.engining.pg.support.core.exception.ErrorCode;
 import net.engining.pg.support.core.exception.ErrorMessageException;
 import net.engining.pg.support.utils.ExceptionUtilsExt;
+import net.engining.pg.support.utils.ValidateUtilExt;
 import net.engining.pg.web.AsynInd;
 
 /**
@@ -73,10 +75,12 @@ public class CommonRocketMqTransactionalProducer extends AbstractMQTransactionPr
 			ctInboundJournal.setRetryCount(new Integer(0));
 			ctInboundJournal.setSvPrId(msg.getUserProperty(SvPrIdKey.class.getCanonicalName()));
 			ctInboundJournal.setTransCode(msg.getUserProperty(TransCodeKey.class.getCanonicalName()));
-			DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd");
-			ctInboundJournal.setTgBizDate(LocalDate.parse(msg.getUserProperty(TargetBizDateKey.class.getCanonicalName()), format).toDate());
+			if(ValidateUtilExt.isNotNullOrEmpty(msg.getUserProperty(TargetBizDateKey.class.getCanonicalName()))){
+				DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd");
+				ctInboundJournal.setTgBizDate(LocalDate.parse(msg.getUserProperty(TargetBizDateKey.class.getCanonicalName()), format).toDate());
+			}
 			ctInboundJournal.setTransStatus(TransStatusDef.S);
-			//ctInboundJournal.setTransVersion(msg.getUserProperty(TxnVersionKey.class.getCanonicalName()));
+			ctInboundJournal.setTransVersion(msg.getUserProperty(TxnVersionKey.class.getCanonicalName()));
 			ctInboundJournal.setTxnDatetime(new Date());
 			ctInboundJournal.setTxnSerialNo(msg.getKeys());
 			ctInboundJournal.setMqMsgId(msg.getTransactionId());

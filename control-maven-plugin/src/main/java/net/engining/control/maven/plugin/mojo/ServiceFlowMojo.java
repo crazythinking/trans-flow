@@ -126,9 +126,11 @@ public class ServiceFlowMojo extends AbstractMojo {
 
 			// 记录FlowTrans列表
 			Properties flowListProperties = new Properties();
+			getLog().info("待扫描的scanPackages size:"+scanPackages.length);
 			for (String scanPackage : scanPackages) {
 				ClassPath classpath = ClassPath.from(classLoader);
 				// 扫描出所有顶级类(即除了内部类)
+				getLog().info("正在扫描scanPackage:"+scanPackage+"===============================================================");
 				ImmutableSet<ClassInfo>  classInfos = classpath.getTopLevelClassesRecursive(scanPackage);
 				getLog().debug(classInfos.toString());
 				for (ClassInfo info : classpath.getTopLevelClassesRecursive(scanPackage)) {
