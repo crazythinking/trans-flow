@@ -13,7 +13,7 @@
 	 -->
     <groupId>net.engining.control</groupId>
     <artifactId>control-maven-plugin</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1.RELEASE</version>
 	<name>Flow Transactions Control - 代码生成Maven插件</name>
 	<packaging>maven-plugin</packaging>
 	<description>用于生成基于ServiceInvoker相关包装类。</description>
@@ -23,7 +23,7 @@
 		<jdk.version>1.8</jdk.version>
 
 		<pg.version>3.2.0-SNAPSHOT</pg.version>
-		<control.version>1.1.1-SNAPSHOT</control.version>
+		<control.version>1.1.1.RELEASE</control.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<ibator.version>1.2.1.681</ibator.version>
 		
@@ -175,22 +175,20 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-			<!-- <id>repo</id> -->
-			<id>zebra</id>
+			<id>repo</id>
+			<!-- <id>zebra</id> -->
 			<distributionManagement>
 				<snapshotRepository>
-					<!-- <id>repo</id> -->
-					<id>zebra</id>
-					<!-- <url>http://172.28.0.124:8081/nexus/content/repositories/snapshots</url> -->
-					<url>http://118.242.36.102:6474/nexus/content/repositories/snapshots</url>
-					<!-- <url>https://dev.aceistar.com:18081/nexus/content/repositories/snapshots</url> -->
+					<id>repo</id>
+					<!-- <id>zebra</id> -->
+					<!-- <url>http://118.242.36.102:6474/nexus/content/repositories/snapshots</url> -->
+					<url>https://dev.aceistar.com:18081/nexus/content/repositories/snapshots</url>
 				</snapshotRepository>
 				<repository>
-					<!-- <id>repo</id> -->
-					<id>zebra</id>
-					<!-- <url>http://172.28.0.124:8081/nexus/content/repositories/releases</url> -->
-					<url>http://118.242.36.102:6474/nexus/content/repositories/releases</url>
-					<!-- <url>https://dev.aceistar.com:18081/nexus/content/repositories/releases</url> -->
+					<id>repo</id>
+					<!-- <id>zebra</id> -->
+					<!-- <url>http://118.242.36.102:6474/nexus/content/repositories/releases</url> -->
+					<url>https://dev.aceistar.com:18081/nexus/content/repositories/releases</url>
 				</repository>
 			</distributionManagement>
 		</profile>
