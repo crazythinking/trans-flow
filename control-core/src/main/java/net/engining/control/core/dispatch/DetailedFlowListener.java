@@ -1,7 +1,5 @@
 package net.engining.control.core.dispatch;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;

@@ -36,6 +36,12 @@
 		    <groupId>com.maihaoche</groupId>
 		    <artifactId>spring-boot-starter-rocketmq</artifactId>
 		    <optional>true</optional>
+		    <exclusions>
+		    	<exclusion>
+		    		<groupId>org.projectlombok</groupId>
+		    		<artifactId>lombok</artifactId>
+		    	</exclusion>
+		    </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
