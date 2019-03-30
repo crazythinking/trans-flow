@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>net.engining.control</groupId>
 		<artifactId>control-parent</artifactId>
-		<version>1.1.1.RELEASE</version>
+		<version>1.1.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	

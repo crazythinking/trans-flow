@@ -3,11 +3,11 @@
 	<parent>
 		<groupId>net.engining.control</groupId>
 		<artifactId>control-parent</artifactId>
-		<version>1.1.1.RELEASE</version>
+		<version>1.1.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>control-dict</artifactId>
-	<name>Transaction Control Dict</name>
+	<name>Transaction Control 数据结构定义(Dict)</name>
 	
 	<dependencies>
 		<dependency>
@@ -80,7 +80,6 @@
 						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
-							<sourceDirectory>${project.build.directory}/pg-entities</sourceDirectory>
 							<outputDirectory>${project.build.directory}/querydsl-sources</outputDirectory>
 							<processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
 						</configuration>
